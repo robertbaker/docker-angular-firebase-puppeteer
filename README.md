@@ -1,6 +1,9 @@
 # angular-cli, firebase-tools, puppeteer docker image
 
-docker image with  [Google Puppeteer](https://github.com/GoogleChrome/puppeteer) installed
+docker image with:
+[Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
+[Angular CLI](https://github.com/angular/cli)
+[FireBase Tools](https://github.com/firebase/firebase-tools)
 
 and [screenshots scripts](#screenshots-tools)
 
@@ -19,47 +22,56 @@ docker pull robertbaker7/docker-angular-firebase-puppeteer:latest
 docker pull robertbaker7/docker-angular-firebase-puppeteer:2.0.0
 # OR
 docker pull robertbaker7/docker-angular-firebase-puppeteer:2
-
 ```
 
 ## before usage
 
+### angular cli project
 
-1. you should pass `--no-sandbox` args when launch browser
+1.  Edit src/karma.config
+
+```
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+module.exports = function(config) {
+    config.set({
+        browsers: ['ChromeHeadless'],
+        flags: ['--no-sandbox'],
+        ...
+    });
+};
+```
+
+1.  you should pass `--no-sandbox` args when launch browser
 
 ```js
 const puppeteer = require('puppeteer');
 
-(async() => {
+(async () => {
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
 
-    const browser = await puppeteer.launch({
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
-    });
+  const page = await browser.newPage();
 
-    const page = await browser.newPage();
+  await page.goto('https://www.google.com/', { waitUntil: 'networkidle2' });
 
-    await page.goto('https://www.google.com/', {waitUntil: 'networkidle2'});
-
-    browser.close();
-
+  browser.close();
 })();
 ```
 
-2. if you got page crash with `BUS_ADRERR` ([chromium issue](https://bugs.chromium.org/p/chromium/issues/detail?id=571394)), increase shm-size on docker run with `--shm-size` argument
+2.  if you got page crash with `BUS_ADRERR` ([chromium issue](https://bugs.chromium.org/p/chromium/issues/detail?id=571394)), increase shm-size on docker run with `--shm-size` argument
 
 ```bash
 docker run --shm-size 1G --rm -v <path_to_script>:/app/index.js robertbaker7/docker-angular-firebase-puppeteer:latest
 ```
 
-3. If you're seeing random navigation errors (unreachable url) it's likely due to ipv6 being enabled in docker. Navigation errors are caused by ERR_NETWORK_CHANGED (-21) in chromium. Disable ipv6 in your container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` to fix:
+3.  If you're seeing random navigation errors (unreachable url) it's likely due to ipv6 being enabled in docker. Navigation errors are caused by ERR_NETWORK_CHANGED (-21) in chromium. Disable ipv6 in your container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` to fix:
+
 ```bash
 docker run --shm-size 1G --sysctl net.ipv6.conf.all.disable_ipv6=1 --rm -v <path_to_script>:/app/index.js robertbaker7/docker-angular-firebase-puppeteer:latest
 ```
 
-4. add `--enable-logging` for chrome debug logging http://www.chromium.org/for-testers/enable-logging
+4.  add `--enable-logging` for chrome debug logging http://www.chromium.org/for-testers/enable-logging
 
 ```js
 const puppeteer = require('puppeteer');
@@ -73,10 +85,7 @@ const puppeteer = require('puppeteer');
         // debug logging
         '--enable-logging', '--v=1'
     ]});
-
-
 ```
-
 
 ## usage
 
@@ -109,8 +118,8 @@ robertbaker7/docker-angular-firebase-puppeteer:latest \
 
 `<tool> <url> <width>x<height> [<delay_in_ms>]`
 
-* `delay_in_ms`: is optional (defaults to `0`)
-  * Waits for `delay_in_ms` milliseconds before taking the screenshot
+- `delay_in_ms`: is optional (defaults to `0`)
+  - Waits for `delay_in_ms` milliseconds before taking the screenshot
 
 ### `screenshot`
 
@@ -131,6 +140,7 @@ output: one line json
     "height":768
 }
 ```
+
 got screenshot in /tmp/screenshots/screenshot_1366_768.png
 
 ### `full_screenshot`
