@@ -28,14 +28,13 @@ docker pull robertbaker7/docker-angular-firebase-puppeteer:2
 
 ### angular cli project
 
-1.  Edit src/karma.config
+1.  Edit `src/karma.config`
 
 ```
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 module.exports = function(config) {
     config.set({
-        browsers: ['ChromeHeadless'],
-        flags: ['--no-sandbox'],
+        browsers: ['ChromeHeadless']
         ...
     });
 };
@@ -47,9 +46,7 @@ module.exports = function(config) {
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+  const browser = await puppeteer.launch();
 
   const page = await browser.newPage();
 
@@ -79,9 +76,6 @@ const puppeteer = require('puppeteer');
 (async() => {
 
     const browser = await puppeteer.launch({args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-
         // debug logging
         '--enable-logging', '--v=1'
     ]});
