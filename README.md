@@ -2,7 +2,7 @@
 
 docker image with:
 [Angular CLI](https://github.com/angular/cli)
-[FireBase Tools](https://github.com/firebase/firebase-tools)
+[Firebase Tools](https://github.com/firebase/firebase-tools)
 [Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
 [screenshots scripts](#screenshots-tools)
 
